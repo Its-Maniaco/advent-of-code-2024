@@ -3,6 +3,8 @@ package utils
 import (
 	"bufio"
 	"os"
+	"strconv"
+	"strings"
 )
 
 // returns a scanner for specified file
@@ -28,4 +30,15 @@ func LineSlice(fileLoc string) (error, []string) {
 		output = append(output, scanner.Text())
 	}
 	return nil, output
+}
+
+// converts a string of numbers into []int based on seperator
+func StringToInts(s string, sep string) []int {
+	nums := strings.Split(s, sep)
+	var output []int
+	for _, num := range nums {
+		numInt, _ := strconv.Atoi(num)
+		output = append(output, numInt)
+	}
+	return output
 }
