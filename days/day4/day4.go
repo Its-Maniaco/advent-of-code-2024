@@ -39,16 +39,17 @@ func Part2(fileLoc string) {
 		log.Fatal(err)
 	}
 
-	ans := 0
+	count := 0
+	mp := create2DSlice(len(lines), len(lines[0]))
 
 	for i, line := range lines {
 		for j, ch := range line {
 			if string(ch) == "M" {
-				ans += checkDiagonal(lines, "MAS", i, j)
+				count += checkX(lines, mp, "MAS", i, j)
 			}
 		}
 	}
-	fmt.Println(ans)
+	fmt.Println(count)
 }
 
 func checkInLine(line string) int {
@@ -89,9 +90,51 @@ func checkDiagonal(mat []string, cmp string, r int, c int) int {
 	return count
 }
 
+func checkX(mat []string, mp [][]int, cmp string, r int, c int) int {
+	count := 0
+
+	// check diagonal, if match, then check cross diagonal
+	if checkDiagTopLeft(mat, cmp, r, c) == 1 {
+		if checkDiagBottomLeft(mat, cmp, r-2, c) == 1 && mp[r-2][c] != 1 {
+			count++
+		} else if checkDiagBottomRight(mat, cmp, r-2, c-2) == 1 && mp[r-2][c-2] != 1 {
+			count++
+		}
+	}
+
+	if checkDiagTopRight(mat, cmp, r, c) == 1 {
+		if checkDiagBottomRight(mat, cmp, r-2, c) == 1 && mp[r-2][c] != 1 {
+			count++
+		} else if checkDiagTopLeft(mat, cmp, r, c+2) == 1 && mp[r][c+2] != 1 {
+			count++
+		}
+	}
+
+	if checkDiagBottomRight(mat, cmp, r, c) == 1 {
+		if checkDiagTopRight(mat, cmp, r+2, c) == 1 && mp[r+2][c] != 1 {
+			count++
+		} else if checkDiagBottomLeft(mat, cmp, r, c+2) == 1 && mp[r][c+2] != 1 {
+			count++
+		}
+	}
+
+	if checkDiagBottomLeft(mat, cmp, r, c) == 1 {
+		if checkDiagBottomRight(mat, cmp, r, c-2) == 1 && mp[r][c-2] != 1 {
+			count++
+		} else if checkDiagTopLeft(mat, cmp, r+2, c) == 1 && mp[r+2][c] != 1 {
+			count++
+		}
+	}
+
+	// current marked to avoid recount when an adjacent X is being searched
+	mp[r][c] = 1
+
+	return count
+}
+
 func checkDiagTopLeft(mat []string, cmp string, r int, c int) int {
 	check := ""
-	for i, j := r, c; i >= 0 && j >= 0 && i >= r-3 && j >= c-3; i, j = i-1, j-1 {
+	for i, j := r, c; i >= 0 && j >= 0 && i >= r-len(cmp)+1 && j >= c-len(cmp)+1; i, j = i-1, j-1 {
 		check = check + string(mat[i][j])
 	}
 	return increaseIfMatch(check, cmp, 0)
@@ -99,7 +142,7 @@ func checkDiagTopLeft(mat []string, cmp string, r int, c int) int {
 
 func checkDiagTopRight(mat []string, cmp string, r int, c int) int {
 	check := ""
-	for i, j := r, c; i >= 0 && j < len(mat[0]) && i >= r-3 && j <= c+3; i, j = i-1, j+1 {
+	for i, j := r, c; i >= 0 && j < len(mat[0]) && i >= r-len(cmp)+1 && j <= c+len(cmp)-1; i, j = i-1, j+1 {
 		check = check + string(mat[i][j])
 	}
 	return increaseIfMatch(check, cmp, 0)
@@ -107,7 +150,7 @@ func checkDiagTopRight(mat []string, cmp string, r int, c int) int {
 
 func checkDiagBottomLeft(mat []string, cmp string, r int, c int) int {
 	check := ""
-	for i, j := r, c; i < len(mat) && j >= 0 && i <= r+3 && j >= c-3; i, j = i+1, j-1 {
+	for i, j := r, c; i < len(mat) && j >= 0 && i <= r+len(cmp)-1 && j >= c-len(cmp)+1; i, j = i+1, j-1 {
 		check = check + string(mat[i][j])
 	}
 	return increaseIfMatch(check, cmp, 0)
@@ -115,7 +158,7 @@ func checkDiagBottomLeft(mat []string, cmp string, r int, c int) int {
 
 func checkDiagBottomRight(mat []string, cmp string, r int, c int) int {
 	check := ""
-	for i, j := r, c; i < len(mat) && j < len(mat[0]) && i <= r+3 && j <= c+3; i, j = i+1, j+1 {
+	for i, j := r, c; i < len(mat) && j < len(mat[0]) && i <= r+len(cmp)-1 && j <= c+len(cmp)-1; i, j = i+1, j+1 {
 		check = check + string(mat[i][j])
 	}
 	return increaseIfMatch(check, cmp, 0)
@@ -126,4 +169,12 @@ func increaseIfMatch(s string, cmp string, count int) int {
 		return count + 1
 	}
 	return count
+}
+
+func create2DSlice(x, y int) [][]int {
+	slice := make([][]int, x)
+	for i := range slice {
+		slice[i] = make([]int, y)
+	}
+	return slice
 }
