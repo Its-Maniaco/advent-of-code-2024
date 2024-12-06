@@ -42,3 +42,23 @@ func StringToInts(s string, sep string) []int {
 	}
 	return output
 }
+
+// get whole input as a 2D slice of string
+func File2DSlice(fileLoc string) (error, [][]string) {
+	var output [][]string
+
+	err, lines := LineSlice(fileLoc)
+	if err != nil {
+		return err, nil
+	}
+
+	for _, line := range lines {
+		var tmp []string
+		for _, ch := range line {
+			tmp = append(tmp, string(ch))
+		}
+		output = append(output, tmp)
+	}
+
+	return nil, output
+}
