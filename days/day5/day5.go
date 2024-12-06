@@ -16,7 +16,8 @@ func Part1(fileLoc string) {
 
 	ordering := make(map[int][]int)
 	flag := false // false for first section
-	ans := 0
+	ansP1 := 0
+	ansP2 := 0
 	for _, line := range lines {
 		fmt.Println(line)
 		if line == "" {
@@ -31,12 +32,16 @@ func Part1(fileLoc string) {
 		} else {
 			// second section
 			nums := utils.StringToInts(line, ",")
-			_, mid := verifyUpdateValidity(ordering, nums)
-			ans += mid
+			valid, mid := verifyUpdateValidity(ordering, nums)
+			ansP1 += mid
+			if !valid {
+				ansP2 += getMidFromIncorrect(ordering, nums)
+			}
 		}
 	}
 
-	fmt.Println(ans)
+	fmt.Println("Day 5 Part 1: ", ansP1)
+	fmt.Println("Day 5 Part 2: ", ansP2)
 }
 
 func setOrdering(mp map[int][]int, k int, v int) {
@@ -53,4 +58,23 @@ func verifyUpdateValidity(mp map[int][]int, nums []int) (bool, int) {
 		}
 	}
 	return true, nums[len(nums)/2]
+}
+
+// only need that element for which half elements are on left
+func getMidFromIncorrect(mp map[int][]int, nums []int) int {
+	for i, num := range nums {
+		count := 0
+		for j := 0; j < len(nums); j++ {
+			if j == i {
+				continue
+			}
+			if slices.Contains(mp[num], nums[j]) {
+				count++
+			}
+		}
+		if count == len(nums)/2 {
+			return num
+		}
+	}
+	return 0
 }
