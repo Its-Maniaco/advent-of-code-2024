@@ -35,9 +35,14 @@ func LineSlice(fileLoc string) (error, []string) {
 // converts a string of numbers into []int based on seperator
 func StringToInts(s string, sep string) []int {
 	nums := strings.Split(s, sep)
+
 	var output []int
 	for _, num := range nums {
-		numInt, _ := strconv.Atoi(num)
+		numInt, err := strconv.Atoi(num)
+		if err != nil {
+			//log.Println("error converting string to number: ", err)
+			continue
+		}
 		output = append(output, numInt)
 	}
 	return output
