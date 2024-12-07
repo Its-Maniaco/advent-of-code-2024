@@ -136,7 +136,7 @@ func travelLeft(fs [][]string, si, sj int) (int, int, int) {
 	return count + 1, si, -1
 }
 
-/*
+/* TODO: Optimize
 func travelVertical(fs [][]string, si, sj int) (int, int) {
 	rLmt, rSub := 0, 1
 	if fs[si][sj] == "V" {
