@@ -7,7 +7,7 @@ import (
 	"github.com/Its-Maniaco/advent-of-code-2024/utils"
 )
 
-func Part1(fileLoc string) {
+func Part(fileLoc string) {
 	err, fs := utils.File2DSlice(fileLoc)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -18,7 +18,11 @@ func Part1(fileLoc string) {
 		log.Fatal("No start found")
 	}
 
-	fmt.Println(bruteTravel(fs, si, sj))
+	// track indices where guard has visited
+	vis := [][]int{}
+
+	//fmt.Println("Part 1 ans: ", bruteTravel(fs, &vis, si, sj))
+	fmt.Println("Part 2 ans: ", loopCount(fs, &vis, si, sj))
 
 }
 
@@ -34,106 +38,170 @@ func findStart(fS [][]string) (int, int) {
 	return -1, -1
 }
 
-func bruteTravel(fs [][]string, si, sj int) int {
-	count := 0
+func bruteTravel(fs [][]string, vis *[][]int, si, sj int) int {
+	uniqcount := 0
+	totalcount := 0
 	for {
 		steps := 0
-		steps, si, sj = travelUp(fs, si, sj)
-		count += steps
+		cnt := 0
+		steps, cnt, si, sj = travelUp(fs, vis, si, sj)
+		uniqcount += steps
+		totalcount += cnt
 		if si == -1 {
 			break
 		}
 
-		steps, si, sj = travelRight(fs, si, sj)
-		count += steps
+		steps, cnt, si, sj = travelRight(fs, vis, si, sj)
+		uniqcount += steps
+		totalcount += cnt
 		if sj == len(fs) {
 			break
 		}
 
-		steps, si, sj = travelDown(fs, si, sj)
-		count += steps
+		steps, cnt, si, sj = travelDown(fs, vis, si, sj)
+		uniqcount += steps
+		totalcount += cnt
 		if si == len(fs) {
 			break
 		}
 
-		steps, si, sj = travelLeft(fs, si, sj)
-		count += steps
+		steps, cnt, si, sj = travelLeft(fs, vis, si, sj)
+		uniqcount += steps
+		totalcount += cnt
 		if sj == -1 {
 			break
 		}
-		utils.PrintGrid(fs)
-		fmt.Println("---------")
+
+		// utils.PrintGrid(fs)
+		// fmt.Println("---------")
+
+		// stuck in infinite loop
+		if totalcount >= len(fs)*len(fs) {
+			return -1
+		}
+	}
+	return uniqcount
+}
+
+func loopCount(fs [][]string, vis *[][]int, si, sj int) int {
+	fscpy := copyGrid(fs)
+	bruteTravel(fscpy, vis, si, sj)
+	count := 0
+	visLoop := *vis
+
+	for _, pst := range visLoop {
+		if pst[0] == si && pst[1] == sj {
+			continue
+		}
+		fscpy2 := copyGrid(fs)
+		fscpy2[pst[0]][pst[1]] = "#"
+		//utils.PrintGrid(fscpy2)
+		if bruteTravel(fscpy2, nil, si, sj) == -1 {
+			fmt.Printf("Obstacle at: (%v,%v)\n", pst[0], pst[1])
+			count++
+		}
 	}
 	return count
 }
 
 // return travel steps and the row,col below '#'
-func travelUp(fs [][]string, si, sj int) (int, int, int) {
-	count := 0
+func travelUp(fs [][]string, vis *[][]int, si, sj int) (int, int, int, int) {
+	uniqcount := 0
+	totalcount := 0
 	for i := si; i > 0; i-- {
+		totalcount++
 		if i == 0 {
 			break
 		}
 		if fs[i][sj] != "X" {
 			fs[i][sj] = "X"
-			count++
+			uniqcount++
+			if vis != nil {
+				*vis = append(*vis, []int{i, sj})
+			}
 		}
 		if fs[i-1][sj] == "#" {
-			return count, i, sj
+			return uniqcount, totalcount, i, sj
 		}
 	}
-	return count + 1, -1, sj // reached edge
+	return uniqcount + 1, totalcount, -1, sj // reached edge
 }
 
-func travelDown(fs [][]string, si, sj int) (int, int, int) {
-	count := 0
+func travelDown(fs [][]string, vis *[][]int, si, sj int) (int, int, int, int) {
+	uniqcount := 0
+	totalcount := 0
 	for i := si; i < len(fs); i++ {
+		totalcount++
 		if i == len(fs)-1 {
 			break
 		}
 		if fs[i][sj] != "X" {
 			fs[i][sj] = "X"
-			count++
+			uniqcount++
+			if vis != nil {
+				*vis = append(*vis, []int{i, sj})
+			}
 		}
 		if fs[i+1][sj] == "#" {
-			return count, i, sj
+			return uniqcount, totalcount, i, sj
 		}
 	}
-	return count + 1, len(fs), sj
+	return uniqcount + 1, totalcount, len(fs), sj
 }
 
-func travelRight(fs [][]string, si, sj int) (int, int, int) {
-	count := 0
+func travelRight(fs [][]string, vis *[][]int, si, sj int) (int, int, int, int) {
+	uniqcount := 0
+	totalcount := 0
 	for j := sj; j < len(fs); j++ {
+		totalcount++
 		if j == len(fs)-1 {
 			break
 		}
 		if fs[si][j] != "X" {
 			fs[si][j] = "X"
-			count++
+			uniqcount++
+			if vis != nil {
+				*vis = append(*vis, []int{si, j})
+			}
 		}
 		if fs[si][j+1] == "#" {
-			return count, si, j
+			return uniqcount, totalcount, si, j
 		}
 	}
-	return count + 1, si, len(fs)
+	return uniqcount + 1, totalcount, si, len(fs)
 }
 
-func travelLeft(fs [][]string, si, sj int) (int, int, int) {
-	count := 0
+func travelLeft(fs [][]string, vis *[][]int, si, sj int) (int, int, int, int) {
+	uniqcount := 0
+	totalcount := 0
 	for j := sj; j > 0; j-- {
+		totalcount++
 		if j == 0 {
 			break
 		}
 		if fs[si][j] != "X" {
 			fs[si][j] = "X"
-			count++
+			uniqcount++
+			if vis != nil {
+				*vis = append(*vis, []int{si, j})
+			}
 		}
 		if fs[si][j-1] == "#" {
-			return count, si, j
+			return uniqcount, totalcount, si, j
 		}
 	}
-	return count + 1, si, -1
+	return uniqcount + 1, totalcount, si, -1
+}
+
+// in 2d slice underlying container still share memory
+// so we need to deep copy
+func copyGrid(org [][]string) [][]string {
+	fscpy := make([][]string, len(org))
+	for i := range org {
+		fscpy[i] = make([]string, len(org[i]))
+		copy(fscpy[i], org[i])
+	}
+	return fscpy
 }
 
 /* TODO: Optimize
