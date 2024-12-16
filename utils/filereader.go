@@ -67,3 +67,19 @@ func File2DSlice(fileLoc string) (error, [][]string) {
 
 	return nil, output
 }
+
+func File2DInt(fileLoc string) ([][]int, error) {
+	err, s := LineSlice(fileLoc)
+	if err != nil {
+		return nil, err
+	}
+
+	out := [][]int{}
+	for _, v := range s {
+
+		tmp := StringToInts(v, "")
+		out = append(out, tmp)
+
+	}
+	return out, nil
+}
