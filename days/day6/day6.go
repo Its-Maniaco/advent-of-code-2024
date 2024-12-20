@@ -84,7 +84,7 @@ func bruteTravel(fs [][]string, vis *[][]int, si, sj int) int {
 }
 
 func loopCount(fs [][]string, vis *[][]int, si, sj int) int {
-	fscpy := copyGrid(fs)
+	fscpy := utils.CopyGrid(fs)
 	bruteTravel(fscpy, vis, si, sj)
 	count := 0
 	visLoop := *vis
@@ -93,7 +93,7 @@ func loopCount(fs [][]string, vis *[][]int, si, sj int) int {
 		if pst[0] == si && pst[1] == sj {
 			continue
 		}
-		fscpy2 := copyGrid(fs)
+		fscpy2 := utils.CopyGrid(fs)
 		fscpy2[pst[0]][pst[1]] = "#"
 		//utils.PrintGrid(fscpy2)
 		if bruteTravel(fscpy2, nil, si, sj) == -1 {
@@ -191,17 +191,6 @@ func travelLeft(fs [][]string, vis *[][]int, si, sj int) (int, int, int, int) {
 		}
 	}
 	return uniqcount + 1, totalcount, si, -1
-}
-
-// in 2d slice underlying container still share memory
-// so we need to deep copy
-func copyGrid(org [][]string) [][]string {
-	fscpy := make([][]string, len(org))
-	for i := range org {
-		fscpy[i] = make([]string, len(org[i]))
-		copy(fscpy[i], org[i])
-	}
-	return fscpy
 }
 
 /* TODO: Optimize
