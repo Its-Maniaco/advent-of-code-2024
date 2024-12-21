@@ -20,11 +20,13 @@ func Part1(fileLoc string) {
 	for i := 0; i < len(path)-1; i++ {
 		for j := i + 1; j < len(path); j++ {
 			dist := distanceBetweenPoints(path[i], path[j])
+			// dist is the time cheat is active for
 			if dist <= 2 {
 				stepDiff := path[i][2] - path[j][2]
 				if stepDiff < 0 {
 					stepDiff *= -1
 				}
+				// steps saved if cheat is activated
 				stepSaved := stepDiff - 2
 				if stepSaved >= 100 {
 					count++
@@ -35,7 +37,7 @@ func Part1(fileLoc string) {
 	fmt.Println("Count: ", count)
 }
 
-// identify route from S to E
+// identify route from S to E and steps from start it takes to reach that point
 func createPath(grid [][]string, start, end []int) [][]int {
 	path := [][]int{}
 
@@ -78,6 +80,7 @@ func createPath(grid [][]string, start, end []int) [][]int {
 	return path
 }
 
+// find start and end points
 func findSE(grid [][]string) ([]int, []int) {
 	start := make([]int, 2)
 	end := make([]int, 2)
@@ -96,6 +99,7 @@ func findSE(grid [][]string) ([]int, []int) {
 	return start, end
 }
 
+// calc linear distance between 2 points
 func distanceBetweenPoints(p1, p2 []int) int {
 	i := p1[0] - p2[0]
 	if i < 0 {
