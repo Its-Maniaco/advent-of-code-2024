@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 
 	"github.com/Its-Maniaco/advent-of-code-2024/utils"
 )
@@ -137,9 +136,4 @@ func distanceBetweenPoints(p1, p2 []int) int {
 	}
 
 	return i + j
-}
-
-// for sorting
-func distance(a []int) float64 {
-	return math.Sqrt(float64(a[0]*a[0] + a[1]*a[1]))
 }

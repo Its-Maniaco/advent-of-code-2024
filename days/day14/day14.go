@@ -14,26 +14,27 @@ func Part1(fileLoc string) {
 		log.Fatal(err)
 	}
 
-	grid := getFinalGrid(fs, 101, 103)
-	utils.Print2DSlice(grid)
-	fmt.Println("ANS: ", calcQuadrant(grid))
+	getFinalGrid(fs, 101, 103)
+	// utils.Print2DSlice(grid)
+	// fmt.Println("ANS: ", calcQuadrant(grid))
 }
 
-func getFinalGrid(fs []string, col, row int) [][]int {
-	grid := make([][]int, row)
-	for i := range grid {
-		grid[i] = make([]int, col)
-	}
-
-	for _, r := range fs {
-		fmt.Println("r> ", r)
-		x, y, vx, vy := extractPosVel(strings.Split(r, " "))
-		for i := 0; i < 100; i++ {
-			x, y = move(row, col, x, y, vx, vy)
+func getFinalGrid(fs []string, col, row int) {
+	for l := 1; l <= 100; l++ {
+		fmt.Println(l, "th second")
+		grid := make([][]int, row)
+		for i := range grid {
+			grid[i] = make([]int, col)
 		}
-		grid[y][x]++
+		for _, r := range fs {
+			x, y, vx, vy := extractPosVel(strings.Split(r, " "))
+			for i := 0; i < l; i++ {
+				x, y = move(row, col, x, y, vx, vy)
+			}
+			grid[y][x]++
+		}
+		utils.Write2DSliceToFileDay14("days/day14/Output.txt", grid)
 	}
-	return grid
 }
 
 // get initial pos and velocity

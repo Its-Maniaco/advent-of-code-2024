@@ -40,23 +40,30 @@ func getAntiNode(grid [][]string, nodelocs map[string][][]int, pst [][]int) int 
 
 // checks and sets the 2 possible indices for antinode
 func setAntinode(grid [][]string, nodelocs map[string][][]int, r1, c1, r2, c2 int) int {
-	rD, cD := intAbs(r2-r1), intAbs(c2-c1) // differences between indices
+	count := 0
+	for i := 0; ; i++ {
+		rD, cD := i*intAbs(r2-r1), i*intAbs(c2-c1) // differences between indices
 
-	// if point 1 is right and up relative to point 2
-	pr1, pc1 := r1-rD, c1+cD // possible row
-	pr2, pc2 := r2+rD, c2-cD // possible column
-	// if point 1 is left and up relative to point 2
-	if c1 < c2 {
-		pr1, pc1 = r1-rD, c1-cD
-		pr2, pc2 = r2+rD, c2+cD
+		// if point 1 is right and up relative to point 2
+		pr1, pc1 := r1-rD, c1+cD // possible row
+		pr2, pc2 := r2+rD, c2-cD // possible column
+		// if point 1 is left and up relative to point 2
+		if c1 < c2 {
+			pr1, pc1 = r1-rD, c1-cD
+			pr2, pc2 = r2+rD, c2+cD
+		}
+
+		if (pr1 < 0 || pr1 >= len(grid) || pc1 < 0 || pc1 >= len(grid)) && (pr2 < 0 || pr2 >= len(grid) || pc2 < 0 || pc2 >= len(grid)) {
+			break
+		}
+
+		fmt.Printf("Trying#: (%v,%v)\n", pr1, pc1)
+
+		count += setGrid(grid, nodelocs, grid[r1][c1], pr1, pc1)
+		fmt.Printf("Trying#: (%v,%v)\n", pr2, pc2)
+		count += setGrid(grid, nodelocs, grid[r1][c1], pr2, pc2)
 	}
 
-	fmt.Printf("Trying#: (%v,%v)\n", pr1, pc1)
-	count := 0
-
-	count += setGrid(grid, nodelocs, grid[r1][c1], pr1, pc1)
-	fmt.Printf("Trying#: (%v,%v)\n", pr2, pc2)
-	count += setGrid(grid, nodelocs, grid[r1][c1], pr2, pc2)
 	return count
 }
 
@@ -69,13 +76,11 @@ func setGrid(grid [][]string, nodelocs map[string][][]int, nodelocKey string, r,
 	if grid[r][c] != "#" {
 		grid[r][c] = "#"
 		nodelocs[nodelocKey] = append(nodelocs[nodelocKey], []int{r, c})
+		utils.PrintGrid(grid)
+		fmt.Println("---------")
 		return 1
 	}
-
-	// utils.PrintGrid(grid)
-	// fmt.Println("---------")
 	return 0
-
 }
 
 // get inital map of all characters

@@ -29,6 +29,19 @@ func Part1(fileLoc string) {
 	fmt.Println(ans)
 }
 
+func Part2(fileLoc string) {
+	err, fs := utils.LineSlice(fileLoc)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = 0
+
+	for _, line := range fs {
+		_, _ = parseInput(line)
+
+	}
+}
+
 func recur(cmp int, nums []int, sum int, s int, count *int) int {
 	/*base condition: all nums have been accounted*/
 	if s == len(nums) {
@@ -52,6 +65,20 @@ func recur(cmp int, nums []int, sum int, s int, count *int) int {
 	return 0
 }
 
+func recurElephant(cmp int, nums []int, sum int, s int) int {
+	if s == len(nums) {
+		if sum == cmp {
+			return 1
+		}
+		return 0
+	}
+
+	for i := s; i < s+1; i++ {
+
+	}
+	return 0
+}
+
 func parseInput(line string) (int, []int) {
 	var output []int
 	tmp := strings.Split(line, ":")
@@ -63,4 +90,9 @@ func parseInput(line string) (int, []int) {
 
 	output = append(output, utils.StringToInts(tmp[1], " ")...)
 	return a, output
+}
+
+// ab||cd gives abcd as int
+func concat(a, b int) (int, error) {
+	return strconv.Atoi(fmt.Sprintf("%v", a) + fmt.Sprintf("%v", b))
 }

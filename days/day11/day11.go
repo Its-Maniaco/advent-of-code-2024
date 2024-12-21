@@ -26,8 +26,16 @@ func Part1(fileLoc string) {
 
 }
 
+// func stoneCnt(nums []int) int {
+// 	cnt := 0
+// 	for _, n := range nums {
+
+// 	}
+// }
+
 func blinkNTimes(nums []uint64, n uint64) []uint64 {
 	for i := uint64(0); i < n; i++ {
+		fmt.Println("i: ", i)
 		nums = blink(nums)
 	}
 	return nums
