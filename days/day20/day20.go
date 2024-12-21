@@ -37,6 +37,33 @@ func Part1(fileLoc string) {
 	fmt.Println("Count: ", count)
 }
 
+func Part2(fileLoc string) {
+	err, fs := utils.File2DSlice(fileLoc)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	start, end := findSE(fs)
+	path := createPath(fs, start, end)
+	count := 0
+	for i := 0; i < len(path)-1; i++ {
+		for j := i + 1; j < len(path); j++ {
+			dist := distanceBetweenPoints(path[i], path[j])
+			if dist <= 20 {
+				stepDiff := path[i][2] - path[j][2]
+				if stepDiff < 0 {
+					stepDiff *= -1
+				}
+				stepSaved := stepDiff - dist
+				if stepSaved >= 100 {
+					count++
+				}
+			}
+		}
+	}
+	fmt.Println("Count: ", count)
+}
+
 // identify route from S to E and steps from start it takes to reach that point
 func createPath(grid [][]string, start, end []int) [][]int {
 	path := [][]int{}
@@ -75,7 +102,6 @@ func createPath(grid [][]string, start, end []int) [][]int {
 			return d1 < d2
 		})
 	*/
-	fmt.Println(path)
 
 	return path
 }
