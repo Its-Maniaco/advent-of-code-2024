@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -82,4 +83,22 @@ func File2DInt(fileLoc string) ([][]int, error) {
 
 	}
 	return out, nil
+}
+
+// return each line parsed as int
+func LineInt(fileLoc string) (error, []int) {
+	err, fs := LineSlice(fileLoc)
+	if err != nil {
+		return err, nil
+	}
+	nums := []int{}
+	for _, s := range fs {
+		num, err := strconv.Atoi(s)
+		if err != nil {
+			log.Fatal("Could not parse number: ", num)
+		}
+		nums = append(nums, num)
+	}
+
+	return nil, nums
 }
