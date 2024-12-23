@@ -20,26 +20,24 @@ func Part1(fileLoc string) {
 	memo := make(map[int]int)
 	for _, num := range nums {
 		sec := num
-		newSecret := true
+		//newSecret := true
 		for i := 1; i <= 2000; {
-			sec, newSecret = nextSecret(sec, memo)
-			if !newSecret {
-				continue
-			}
+			sec, _ = nextSecret(sec, memo)
+			// if !newSecret {
+			// 	continue
+			// }
 			i++
 		}
 		fmt.Printf("Calculating secrets for: %v & last secret: %v\n", num, sec)
+		//utils.AppendIntegerToFile("myoutput.txt", sec)
 		finalSecrets = append(finalSecrets, sec)
 	}
-
-	fmt.Println("Nums length ", len(nums))
-	fmt.Println("Final Secrets length ", len(finalSecrets))
-
+	//fmt.Println(finalSecrets)
 	ans := addSecets(finalSecrets)
 	fmt.Println("Ans: ", ans)
 }
 
-// returns next secret and flag if new secret FOR THAT PERSON
+// returns next secret and flag if secret is unique till that point
 func nextSecret(sec int, memo map[int]int) (int, bool) {
 	tmp := sec
 	//check if cached
