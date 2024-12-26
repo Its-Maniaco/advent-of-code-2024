@@ -1,5 +1,11 @@
 package main
 
+import "fmt"
+
 func main() {
-	Part1("Input.txt")
+	fmt.Println("Part1 :")
+	Part("Input.txt", false)
+
+	fmt.Println("Part2 :")
+	Part("Input.txt", true)
 }

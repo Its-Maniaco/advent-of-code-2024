@@ -9,7 +9,7 @@ import (
 	"github.com/Its-Maniaco/advent-of-code-2024/utils"
 )
 
-func Part1(fileLoc string) {
+func Part(fileLoc string, flag bool) {
 	err, fs := utils.LineSlice(fileLoc)
 	if err != nil {
 		fmt.Println(err)
@@ -30,7 +30,11 @@ func Part1(fileLoc string) {
 		t = strings.Split(fs[i+2], ", ")
 		pX, _ := strconv.Atoi(t[0][9:])
 		pY, _ := strconv.Atoi(t[1][2:])
-		fmt.Printf("Line %v\n\t\tA: %v,%v\n\t\tB:%v,%v\n\t\tPrize:%v,%v\n", i, aX, aY, bX, bY, pX, pY)
+		if flag {
+			pX += 10000000000000
+			pY += 10000000000000
+		}
+		//fmt.Printf("Line %v\n\t\tA: %v,%v\n\t\tB:%v,%v\n\t\tPrize:%v,%v\n", i, aX, aY, bX, bY, pX, pY)
 		cost := calcTokens([2]int{aX, aY}, [2]int{bX, bY}, [2]int{pX, pY})
 		if cost != -1 {
 			totalCost += cost
@@ -45,22 +49,20 @@ func calcTokens(a, b, prize [2]int) int {
 	bx, by := b[0], b[1]
 	prizex, prizey := prize[0], prize[1]
 
-	cost := math.MaxInt
-	// press A
-	for cntA := 0; cntA <= prizex/ax && cntA <= prizey/ay && cntA < 100; cntA++ {
-		// count B presses
-		Xleft, Yleft := prizex-cntA*ax, prizey-cntA*ay
-		if Xleft%bx == 0 && Yleft%by == 0 {
-			cntB := Xleft / bx
-			if cntB >= 0 && cntB <= 100 && cntB*by == Yleft {
-				fmt.Printf("\t\tPress A: %v times & B: %v times\n", cntA, cntB)
-				cost = int(math.Min(float64(cost), float64(cntA*3+cntB*1)))
-			}
-		}
-	}
+	/*
+		ax*cntA + bx*cntB = prizex
+		ay*cntA + by*cntB = prizey
+	*/
 
-	if cost == math.MaxInt {
+	cntA := float64(((by * prizex) - (bx * prizey))) / float64((ax*by)-(ay*bx))
+	// if not whole number
+	if math.Round(cntA) != cntA {
 		return -1
 	}
+	cntB := float64(prizey-(ay*int(cntA))) / float64(by)
+	if math.Round(cntB) != cntB {
+		return -1
+	}
+	cost := int(3*cntA + cntB)
 	return cost
 }
