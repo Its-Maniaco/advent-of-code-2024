@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/Its-Maniaco/advent-of-code-2024/utils"
@@ -14,27 +15,81 @@ func Part1(fileLoc string) {
 		log.Fatal(err)
 	}
 
-	getFinalGrid(fs, 101, 103)
-	// utils.Print2DSlice(grid)
-	// fmt.Println("ANS: ", calcQuadrant(grid))
+	grid := getFinalGrid(fs, 101, 103)
+	//utils.Print2DSlice(grid)
+	fmt.Println("ANS: ", calcQuadrant(grid))
 }
 
-func getFinalGrid(fs []string, col, row int) {
-	for l := 1; l <= 100; l++ {
-		fmt.Println(l, "th second")
-		grid := make([][]int, row)
-		for i := range grid {
-			grid[i] = make([]int, col)
-		}
-		for _, r := range fs {
-			x, y, vx, vy := extractPosVel(strings.Split(r, " "))
-			for i := 0; i < l; i++ {
-				x, y = move(row, col, x, y, vx, vy)
-			}
-			grid[y][x]++
-		}
-		utils.Write2DSliceToFileDay14("days/day14/Output.txt", grid)
+// pattern can form anytime i.e do not wait for everyone to move once and then checking
+func Part2(fileLoc string) {
+	err, fs := utils.LineSlice(fileLoc)
+	if err != nil {
+		log.Fatal(err)
 	}
+	// delete output file if it exists
+	err = os.Remove("Output.txt")
+	if err != nil {
+		log.Println("Error deleting file: ", err)
+	} else {
+		log.Println("File deleted.")
+	}
+
+	col, row := 101, 103
+	grid := make([][]int, row)
+	for k := range grid {
+		grid[k] = make([]int, col)
+	}
+
+	// to store last position for each robo
+	loc := make(map[int][2]int, len(fs))
+	// store initial loc of each robo in map
+	for i, r := range fs {
+		x, y, _, _ := extractPosVel(strings.Split(r, " "))
+		loc[i] = [2]int{x, y}
+		grid[y][x]++
+	}
+
+	//utils.Print2DSlice(grid)
+
+	for i := 0; i < 9000; i++ {
+		// move each robot sequentially
+		for roboNum, r := range fs {
+			// get velocity & last location for that robo
+			_, _, vx, vy := extractPosVel(strings.Split(r, " "))
+			x, y := loc[roboNum][0], loc[roboNum][1]
+
+			nx, ny := move(row, col, x, y, vx, vy)
+			loc[roboNum] = [2]int{nx, ny}
+			// add new location to grid
+			grid[y][x]--
+			grid[ny][nx]++
+			//write output to file
+			if search(grid) {
+
+				err = utils.Write2DSliceToFile("Output.txt", grid, i)
+				if err != nil {
+					log.Println("Error creating ouput file.")
+				}
+			}
+		}
+
+	}
+}
+
+func getFinalGrid(fs []string, col, row int) [][]int {
+	grid := make([][]int, row)
+	for i := range grid {
+		grid[i] = make([]int, col)
+	}
+	for _, r := range fs {
+		//fmt.Println("r> ", r)
+		x, y, vx, vy := extractPosVel(strings.Split(r, " "))
+		for i := 0; i < 100; i++ {
+			x, y = move(row, col, x, y, vx, vy)
+		}
+		grid[y][x]++
+	}
+	return grid
 }
 
 // get initial pos and velocity
@@ -104,4 +159,17 @@ func calcQuadrant(grid [][]int) int {
 		}
 	}
 	return grad1 * grad2 * grad3 * grad4
+}
+
+func search(grid [][]int) bool {
+	for i := 0; i < len(grid); i++ {
+		// look for 5 continous non-zero number
+		for j := 0; j < len(grid[0])-1-5; j++ {
+			if grid[i][j] != 0 && grid[i][j+1] != 0 && grid[i][j+2] != 0 && grid[i][j+3] != 0 &&
+				grid[i][j+4] != 0 {
+				return true
+			}
+		}
+	}
+	return false
 }

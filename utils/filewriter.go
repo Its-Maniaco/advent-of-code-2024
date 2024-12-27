@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func Write2DSliceToFile(filePath string, grid [][]int) error {
+func Write2DSliceToFile(filePath string, grid [][]int, ind int) error {
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("cannot open file: %w", err)
@@ -14,13 +14,24 @@ func Write2DSliceToFile(filePath string, grid [][]int) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-
+	v := ""
+	if ind != 0 {
+		_, err = writer.WriteString(fmt.Sprintf("%v\n", ind))
+		if err != nil {
+			return fmt.Errorf("failed to write index to file: %w", err)
+		}
+	}
 	for _, row := range grid {
 		for j, val := range row {
-			if j == len(row)-1 {
-				_, err = writer.WriteString(fmt.Sprintf("%d", val))
+			if val == 0 {
+				v = "."
 			} else {
-				_, err = writer.WriteString(fmt.Sprintf("%d ", val))
+				v = "*"
+			}
+			if j == len(row)-1 {
+				_, err = writer.WriteString(fmt.Sprintf("%v", v))
+			} else {
+				_, err = writer.WriteString(fmt.Sprintf("%v ", v))
 			}
 			if err != nil {
 				return fmt.Errorf("failed to write: %w", err)
@@ -31,7 +42,7 @@ func Write2DSliceToFile(filePath string, grid [][]int) error {
 			return fmt.Errorf("failed to write newline to file: %w", err)
 		}
 	}
-	_, err = writer.WriteString("------------------------------------------------------------")
+	_, err = writer.WriteString("\n------------------------------------------------------------\n")
 	if err != nil {
 		return fmt.Errorf("failed to write - to file: %w", err)
 	}
